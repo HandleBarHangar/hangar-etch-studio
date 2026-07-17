@@ -260,7 +260,8 @@ function EventEditor({
         ends_at: endTime ? new Date(`${date}T${endTime}`).toISOString() : null,
         is_active: active,
         max_items_per_person: maxPer.trim() === "" ? null : Number(maxPer),
-        max_revisions: Number(revisions) || 3,
+        max_revisions:
+          revisions.trim() === "" || Number.isNaN(Number(revisions)) ? 3 : Number(revisions),
         capture_contact: captureContact,
         capture_name: captureName,
         capture_email: captureEmail,
