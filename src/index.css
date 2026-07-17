@@ -1,0 +1,61 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html,
+body,
+#root {
+  min-height: 100%;
+}
+
+body {
+  @apply bg-navy text-cream font-body antialiased;
+  overscroll-behavior: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Kiosk: block pinch-zoom weirdness, keep touches snappy */
+.kiosk-locked {
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-gold text-ink font-display text-2xl tracking-wide uppercase rounded-2xl px-8 py-4 min-h-[56px] shadow-lg shadow-black/30 active:scale-[0.98] transition disabled:opacity-40 disabled:pointer-events-none hover:bg-gold-soft;
+  }
+  .btn-secondary {
+    @apply bg-navy-mid border border-muted/30 text-cream font-display text-xl tracking-wide uppercase rounded-2xl px-6 py-3.5 min-h-[56px] active:scale-[0.98] transition disabled:opacity-40 hover:border-gold/60;
+  }
+  .card {
+    @apply bg-navy-mid rounded-3xl border border-white/5 shadow-xl shadow-black/20;
+  }
+  .headline {
+    @apply font-display uppercase leading-none tracking-wide;
+  }
+  .input-field {
+    @apply w-full rounded-xl bg-navy-deep border border-muted/30 px-4 py-3.5 text-cream placeholder:text-muted/60 focus:outline-none focus:border-gold text-base;
+  }
+  .chip {
+    @apply rounded-full border border-muted/40 px-4 py-2 text-sm text-muted active:scale-95 transition hover:border-gold hover:text-gold;
+  }
+  .chip-active {
+    @apply border-gold text-gold bg-gold/10;
+  }
+}
+
+/* Gallery wall animation */
+@keyframes etch-pop {
+  from {
+    opacity: 0;
+    transform: scale(0.92) translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+.gallery-pop {
+  animation: etch-pop 0.5s ease-out both;
+}
