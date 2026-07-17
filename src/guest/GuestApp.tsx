@@ -50,6 +50,7 @@ const FRIENDLY_ERRORS: Record<string, string> = {
   SOLD_OUT: "That item just sold out for this event — pick another and you're back in business.",
   PER_PERSON_LIMIT: "You've hit this event's per-person limit. A Hangar team member can help with more.",
   ITEM_NOT_OFFERED: "That item isn't offered at this event — pick another.",
+  ITEM_REQUIRED: "Pick what we're making first — then send it to print.",
   REVISIONS_EXHAUSTED: "That's the last of your free tweaks — this one's a keeper!",
   RATE_LIMITED: "Whoa, speed racer — give it a few minutes and try again.",
   MODERATION_BLOCKED: "Let's try a different idea — that one's not something we can engrave.",
