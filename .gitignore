@@ -4,3 +4,6 @@ dist
 .env.local
 *.local
 .DS_Store
+
+# internal briefs stay local
+FABLE-PROMPT.md
