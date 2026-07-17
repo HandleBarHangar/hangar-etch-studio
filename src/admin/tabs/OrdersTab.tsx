@@ -125,7 +125,7 @@ export default function OrdersTab({ passcode }: { passcode: string }) {
                   {new Date(o.created_at).toLocaleString()} · {o.entry_mode}
                 </p>
               </div>
-              {o.clickup_task_id ? (
+              {o.clickup_task_id && !o.clickup_error ? (
                 <a
                   href={o.clickup_task_url ?? "#"}
                   target="_blank"
