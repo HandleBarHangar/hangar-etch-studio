@@ -103,7 +103,8 @@ export function TimeSelect({
         disabled={h12 === ""}
         onChange={(e) => emit(h12, e.target.value, meridiem)}
       >
-        {["00", "15", "30", "45"].map((m) => (
+        {/* keep a stored off-grid minute (e.g. :10) selectable */}
+        {[...new Set(["00", "15", "30", "45", minute])].sort().map((m) => (
           <option key={m} value={m}>:{m}</option>
         ))}
       </select>
