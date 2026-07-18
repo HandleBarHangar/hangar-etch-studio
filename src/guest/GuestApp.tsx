@@ -9,7 +9,14 @@ import {
   uploadToBucket,
 } from "../lib/api";
 import type { EventContext, EtchItem, GuestInfo, InputMode } from "../lib/types";
-import { canvasToBlob, loadImage, renderFinal, renderText, TextFontId } from "../lib/canvas";
+import {
+  canvasToBlob,
+  canvasToSvgBlob,
+  loadImage,
+  renderFinal,
+  renderText,
+  TextFontId,
+} from "../lib/canvas";
 import { LoadingOverlay, ScreenShell } from "./components";
 import Welcome from "./screens/Welcome";
 import ItemPicker from "./screens/ItemPicker";
@@ -264,10 +271,20 @@ export default function GuestApp({ params }: { params: UrlParams }) {
       const blob = await canvasToBlob(finalCanvas);
       const finalPath = `final/${sessionId}/${crypto.randomUUID()}.png`;
       await uploadToBucket(finalPath, blob);
+      // Vector twin for the engraver — best-effort; never blocks the order.
+      let finalSvgPath: string | null = null;
+      try {
+        const svgBlob = await canvasToSvgBlob(finalCanvas);
+        finalSvgPath = `final/${sessionId}/${crypto.randomUUID()}.svg`;
+        await uploadToBucket(finalSvgPath, svgBlob);
+      } catch {
+        finalSvgPath = null;
+      }
       const res = await sendToPrint({
         sessionId,
         deviceToken,
         finalPath,
+        finalSvgPath,
         inputMode: mode,
         prompt: mode === "describe" || mode === "text" ? prompt : null,
         itemId: item?.id ?? null,

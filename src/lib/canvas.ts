@@ -28,26 +28,20 @@ interface FinalizeOptions {
   threshold: number | null;
 }
 
-/**
- * Draw the source at up to FINAL_LONG_EDGE on a white background, convert to
- * grayscale, and optionally hard-threshold to pure 1-bit black/white.
- */
-export function renderFinal(
+/** Draw source onto a white canvas at w×h, grayscale (+optional threshold). */
+function drawProcessed(
   source: HTMLImageElement | HTMLCanvasElement,
-  { threshold }: FinalizeOptions,
+  w: number,
+  h: number,
+  threshold: number | null,
 ): HTMLCanvasElement {
-  const srcW = source.width;
-  const srcH = source.height;
-  const scale = FINAL_LONG_EDGE / Math.max(srcW, srcH);
-  const w = Math.round(srcW * scale);
-  const h = Math.round(srcH * scale);
-
   const canvas = document.createElement("canvas");
   canvas.width = w;
   canvas.height = h;
   const ctx = canvas.getContext("2d")!;
   ctx.fillStyle = "#ffffff";
   ctx.fillRect(0, 0, w, h);
+  ctx.imageSmoothingEnabled = true;
   ctx.imageSmoothingQuality = "high";
   ctx.drawImage(source, 0, 0, w, h);
 
@@ -68,36 +62,46 @@ export function renderFinal(
   return canvas;
 }
 
-/** Fast preview-sized version of renderFinal for the live threshold slider. */
+/**
+ * Finalize at FINAL_LONG_EDGE on white, grayscale, optionally pure 1-bit.
+ * Thresholded output is rendered with 2× supersampling — threshold at double
+ * resolution, then area-downsample and re-threshold — which halves the
+ * staircase artifacts a single hard threshold produces on upscaled sources.
+ */
+export function renderFinal(
+  source: HTMLImageElement | HTMLCanvasElement,
+  { threshold }: FinalizeOptions,
+): HTMLCanvasElement {
+  const long = Math.max(source.width, source.height);
+  const scale = FINAL_LONG_EDGE / long;
+  const w = Math.round(source.width * scale);
+  const h = Math.round(source.height * scale);
+
+  if (threshold === null) {
+    return drawProcessed(source, w, h, null);
+  }
+  const superCanvas = drawProcessed(source, w * 2, h * 2, threshold);
+  return drawProcessed(superCanvas, w, h, 128);
+}
+
+/**
+ * Preview-sized version of renderFinal for the live threshold slider.
+ * 1536px long edge covers a full-width card on a 2× retina iPad without the
+ * chunky upscaling artifacts a small preview canvas produces.
+ */
 export function renderPreview(
-  source: HTMLImageElement,
+  source: HTMLImageElement | HTMLCanvasElement,
   threshold: number | null,
-  maxEdge = 640,
+  maxEdge = 1536,
 ): HTMLCanvasElement {
   const scale = Math.min(1, maxEdge / Math.max(source.width, source.height));
   const w = Math.round(source.width * scale);
   const h = Math.round(source.height * scale);
-  const canvas = document.createElement("canvas");
-  canvas.width = w;
-  canvas.height = h;
-  const ctx = canvas.getContext("2d")!;
-  ctx.fillStyle = "#ffffff";
-  ctx.fillRect(0, 0, w, h);
-  ctx.drawImage(source, 0, 0, w, h);
-  const imageData = ctx.getImageData(0, 0, w, h);
-  const px = imageData.data;
-  for (let i = 0; i < px.length; i += 4) {
-    const a = px[i + 3] / 255;
-    const r = px[i] * a + 255 * (1 - a);
-    const g = px[i + 1] * a + 255 * (1 - a);
-    const b = px[i + 2] * a + 255 * (1 - a);
-    const lum = 0.299 * r + 0.587 * g + 0.114 * b;
-    const v = threshold === null ? lum : lum < threshold ? 0 : 255;
-    px[i] = px[i + 1] = px[i + 2] = v;
-    px[i + 3] = 255;
+  if (threshold === null) {
+    return drawProcessed(source, w, h, null);
   }
-  ctx.putImageData(imageData, 0, 0);
-  return canvas;
+  const superCanvas = drawProcessed(source, w * 2, h * 2, threshold);
+  return drawProcessed(superCanvas, w, h, 128);
 }
 
 export const TEXT_FONTS = [
@@ -218,6 +222,41 @@ export async function renderShareCard(
   ctx.font = '500 26px Inter, sans-serif';
   ctx.fillText(orderCode, size / 2, size - 64);
   return canvas;
+}
+
+/**
+ * Trace the finalized 1-bit design into an SVG (vector twin for the engraver —
+ * staff use SVG or PNG depending on the job). Traces a 1024px re-thresholded
+ * copy: fast on an iPad, and bold engraving art loses nothing at that size.
+ */
+export async function canvasToSvgBlob(finalCanvas: HTMLCanvasElement): Promise<Blob> {
+  const { default: ImageTracer } = await import("imagetracerjs");
+  const traceSource = renderPreview(finalCanvas, 128, 1024);
+  const ctx = traceSource.getContext("2d")!;
+  const imageData = ctx.getImageData(0, 0, traceSource.width, traceSource.height);
+  const svg = ImageTracer.imagedataToSVG(imageData, {
+    // Two-color palette, no blur, minimal path simplification: crisp B&W vectors.
+    pal: [
+      { r: 0, g: 0, b: 0, a: 255 },
+      { r: 255, g: 255, b: 255, a: 255 },
+    ],
+    numberofcolors: 2,
+    colorsampling: 0,
+    colorquantcycles: 1,
+    blurradius: 0,
+    ltres: 1,
+    qtres: 1,
+    pathomit: 8,
+    rightangleenhance: true,
+    strokewidth: 0,
+    roundcoords: 1,
+    viewbox: true,
+    desc: false,
+  });
+  if (typeof svg !== "string" || !svg.includes("<svg")) {
+    throw new Error("SVG trace failed");
+  }
+  return new Blob([svg], { type: "image/svg+xml" });
 }
 
 export function downloadCanvas(canvas: HTMLCanvasElement, filename: string): void {

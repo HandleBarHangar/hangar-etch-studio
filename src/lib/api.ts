@@ -78,6 +78,7 @@ export function sendToPrint(args: {
   sessionId: string;
   deviceToken: string;
   finalPath: string;
+  finalSvgPath: string | null;
   inputMode: InputMode;
   prompt: string | null;
   itemId: string | null;
@@ -91,6 +92,7 @@ export function sendToPrint(args: {
     session_id: args.sessionId,
     device_token: args.deviceToken,
     final_path: args.finalPath,
+    final_svg_path: args.finalSvgPath,
     input_mode: args.inputMode,
     prompt: args.prompt,
     item_id: args.itemId,
