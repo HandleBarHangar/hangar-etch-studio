@@ -1,7 +1,7 @@
 {
-  "name": "Etch Studio — Hangar Indy",
-  "short_name": "Etch Studio",
-  "description": "Your idea. Engraved.",
+  "name": "Hangar Customs — Hangar Indy",
+  "short_name": "Hangar Customs",
+  "description": "Designed by you. Made in Indy.",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#0E2A56",

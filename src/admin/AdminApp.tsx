@@ -62,7 +62,7 @@ export default function AdminApp() {
           }}
         >
           <h1 className="headline text-3xl text-center">
-            Etch Studio <span className="text-gold">Admin</span>
+            Hangar Customs <span className="text-gold">Admin</span>
           </h1>
           <input
             className="input-field text-center text-2xl tracking-widest"
@@ -86,7 +86,7 @@ export default function AdminApp() {
     <div className="min-h-screen max-w-5xl mx-auto p-4 sm:p-6">
       <header className="flex flex-wrap items-center justify-between gap-4 mb-6">
         <h1 className="headline text-3xl">
-          Etch Studio <span className="text-gold">Admin</span>
+          Hangar Customs <span className="text-gold">Admin</span>
         </h1>
         <nav className="flex gap-2 flex-wrap">
           {(

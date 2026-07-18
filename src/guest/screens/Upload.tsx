@@ -1,19 +1,22 @@
 import { useEffect, useRef, useState } from "react";
-import { ImageUp } from "lucide-react";
+import { ImageUp, TriangleAlert } from "lucide-react";
 import { loadImage, renderPreview } from "../../lib/canvas";
+import { analyzeLaserability } from "../../lib/laserability";
 import { BackLink, ErrorBanner, TwoBeat } from "../components";
 
 interface Props {
   error: string | null;
+  designerUrl?: string | null;
   onAccept: (image: HTMLImageElement, threshold: number | null) => void;
   onBack: () => void;
 }
 
-export default function Upload({ error, onAccept, onBack }: Props) {
+export default function Upload({ error, designerUrl, onAccept, onBack }: Props) {
   const [image, setImage] = useState<HTMLImageElement | null>(null);
   const [bwOn, setBwOn] = useState(true);
   const [threshold, setThreshold] = useState(128);
   const [loadError, setLoadError] = useState<string | null>(null);
+  const [laserWarnings, setLaserWarnings] = useState<string[]>([]);
   const previewRef = useRef<HTMLDivElement>(null);
 
   const onFile = async (file: File | undefined) => {
@@ -28,13 +31,15 @@ export default function Upload({ error, onAccept, onBack }: Props) {
     }
   };
 
-  // Live preview: redraw on image/threshold/toggle changes.
+  // Live preview: redraw on image/threshold/toggle changes, and re-run the
+  // laserability check so guests steer toward designs that engrave well.
   useEffect(() => {
     const holder = previewRef.current;
     if (!holder || !image) return;
     const canvas = renderPreview(image, bwOn ? threshold : null);
     canvas.className = "w-full h-auto rounded-xl";
     holder.replaceChildren(canvas);
+    setLaserWarnings(bwOn ? analyzeLaserability(canvas).warnings : []);
   }, [image, bwOn, threshold]);
 
   return (
@@ -59,6 +64,17 @@ export default function Upload({ error, onAccept, onBack }: Props) {
       ) : (
         <>
           <div ref={previewRef} className="bg-cream rounded-2xl p-3" />
+          {laserWarnings.length > 0 && (
+            <div className="rounded-xl border border-gold/40 bg-gold/10 px-4 py-3 text-sm text-gold-soft flex gap-2">
+              <TriangleAlert className="h-5 w-5 shrink-0 mt-0.5" />
+              <div>
+                {laserWarnings.map((w) => (
+                  <p key={w}>{w}</p>
+                ))}
+                <p className="text-muted mt-1">You can still send it — a team member can help fine-tune.</p>
+              </div>
+            </div>
+          )}
           <div className="card p-4 flex flex-col gap-3">
             <label className="flex items-center justify-between">
               <span className="font-semibold">Black &amp; White</span>
@@ -96,6 +112,16 @@ export default function Upload({ error, onAccept, onBack }: Props) {
             Use This Design →
           </button>
         </>
+      )}
+      {!image && designerUrl && (
+        <a
+          href={designerUrl}
+          target="_blank"
+          rel="noreferrer"
+          className="text-center text-sm text-muted underline underline-offset-4"
+        >
+          No design yet? Make one free with our AI designer in ChatGPT, save it, and pick it here →
+        </a>
       )}
       <BackLink onClick={onBack} />
     </div>

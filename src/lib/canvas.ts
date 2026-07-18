@@ -210,10 +210,10 @@ export async function renderShareCard(
   ctx.textAlign = "center";
   ctx.fillStyle = "#F5B921";
   ctx.font = '64px "Bebas Neue", sans-serif';
-  ctx.fillText("MADE BY ME. MADE AT THE HANGAR.", size / 2, 96);
+  ctx.fillText("DESIGNED BY ME. MADE IN INDY.", size / 2, 96);
   ctx.fillStyle = "#F4ECD8";
   ctx.font = '44px "Bebas Neue", sans-serif';
-  ctx.fillText("ETCH STUDIO · HANGARINDY.COM", size / 2, size - 120);
+  ctx.fillText("HANGAR CUSTOMS · HANGARINDY.COM", size / 2, size - 120);
   ctx.fillStyle = "#B8C4D6";
   ctx.font = '500 26px Inter, sans-serif';
   ctx.fillText(orderCode, size / 2, size - 64);

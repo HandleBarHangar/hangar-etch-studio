@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
 import QRCode from "qrcode";
 import { adminCall } from "../../lib/api";
-import { Field, Notice, Toggle, fmtTime, toLocalDateString } from "../common";
+import { Field, Notice, TimeSelect, Toggle, fmtTime, toLocalDateString } from "../common";
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 type AdminEvent = any;
@@ -342,10 +342,10 @@ function EventEditor({
             <input className="input-field" type="date" value={date} onChange={(e) => setDate(e.target.value)} />
           </Field>
           <Field label="Start time">
-            <input className="input-field" type="time" value={startTime} onChange={(e) => setStartTime(e.target.value)} />
+            <TimeSelect value={startTime} onChange={setStartTime} />
           </Field>
           <Field label="End time">
-            <input className="input-field" type="time" value={endTime} onChange={(e) => setEndTime(e.target.value)} />
+            <TimeSelect value={endTime} onChange={setEndTime} />
           </Field>
         </div>
 

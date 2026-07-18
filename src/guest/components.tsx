@@ -19,7 +19,7 @@ export function BrandLockup({ ctx, compact = false }: { ctx: EventContext | null
           el.style.display = "none";
           el.insertAdjacentHTML(
             "afterend",
-            '<span class="font-display text-gold text-2xl tracking-widest">HANGAR • ETCH STUDIO</span>',
+            '<span class="font-display text-gold text-2xl tracking-widest">HANGAR CUSTOMS</span>',
           );
         }}
       />

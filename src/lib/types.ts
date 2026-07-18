@@ -40,6 +40,7 @@ export interface EventContext {
   config: EtchConfig;
   items: EtchItem[];
   device_orders: number;
+  designer_gpt_url?: string | null;
 }
 
 export type InputMode = "describe" | "upload" | "caricature" | "text";

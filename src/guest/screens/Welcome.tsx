@@ -13,7 +13,7 @@ export default function Welcome({ ctx, atLimit, onPick }: Props) {
   return (
     <div className="flex flex-col gap-6 pt-4">
       <BrandLockup ctx={ctx} />
-      <TwoBeat a="Your Idea." b="Engraved." />
+      <TwoBeat a="Designed by You." b="Made in Indy." size="text-4xl" />
       {ctx.event && (
         <p className="text-center text-muted -mt-2">
           Welcome, <span className="text-cream font-semibold">{ctx.event.name}</span>! ✦
@@ -50,12 +50,24 @@ export default function Welcome({ ctx, atLimit, onPick }: Props) {
           {ctx.config.caricature_enabled && (
             <ModeCard
               icon={<Users className="h-8 w-8" />}
-              title="Crew Caricature"
-              sub="Turn a group photo into engraved characters."
+              title="Caricature"
+              sub="Turn a photo of yourself — or the whole crew — into engraved characters."
               onClick={() => onPick("caricature")}
             />
           )}
         </div>
+      )}
+
+      {!atLimit && ctx.designer_gpt_url && (
+        <a
+          href={ctx.designer_gpt_url}
+          target="_blank"
+          rel="noreferrer"
+          className="text-center text-sm text-muted underline underline-offset-4"
+        >
+          Want unlimited tweaks? Design it free with our AI designer in ChatGPT, then come back and
+          tap <span className="text-gold">Upload My Design</span> →
+        </a>
       )}
     </div>
   );

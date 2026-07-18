@@ -15,10 +15,10 @@ export default function Caricature({ error, onCapture, onBack }: Props) {
 
       <label className="card p-10 flex flex-col items-center gap-4 cursor-pointer hover:border-gold/40 transition">
         <Camera className="h-12 w-12 text-gold" />
-        <span className="headline text-2xl">Snap the group</span>
+        <span className="headline text-2xl">Snap a photo</span>
         <span className="text-muted text-sm text-center">
-          We'll turn each person into a clean engraved character. Best with a clear, well-lit photo
-          of everyone facing the camera.
+          Just you, or the whole crew — everyone in the photo becomes a clean engraved character.
+          Best with a clear, well-lit shot, faces toward the camera.
         </span>
         <input
           type="file"
@@ -33,7 +33,7 @@ export default function Caricature({ error, onCapture, onBack }: Props) {
       </label>
 
       <label className="text-center text-muted text-sm underline underline-offset-4 cursor-pointer">
-        Or upload an existing group photo
+        Or upload an existing photo
         <input
           type="file"
           accept="image/*"

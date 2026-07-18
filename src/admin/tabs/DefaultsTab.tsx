@@ -31,6 +31,7 @@ export default function DefaultsTab({ passcode }: { passcode: string }) {
           settings.default_max_items_per_person === "" || settings.default_max_items_per_person === null
             ? null
             : Number(settings.default_max_items_per_person),
+        designer_gpt_url: (settings.designer_gpt_url ?? "").trim() || null,
         capture_contact: settings.capture_contact,
         capture_name: settings.capture_name,
         capture_email: settings.capture_email,
@@ -82,6 +83,15 @@ export default function DefaultsTab({ passcode }: { passcode: string }) {
             <Toggle label="Phone" checked={settings.capture_phone} onChange={(v) => set("capture_phone", v)} />
           </div>
         )}
+        <Field label="ChatGPT designer link (shown to guests when set; blank = hidden)">
+          <input
+            className="input-field"
+            type="url"
+            placeholder="https://chatgpt.com/g/g-…"
+            value={settings.designer_gpt_url ?? ""}
+            onChange={(e) => set("designer_gpt_url", e.target.value)}
+          />
+        </Field>
         <Toggle label="Crew Caricature mode" checked={settings.caricature_enabled} onChange={(v) => set("caricature_enabled", v)} />
         <Toggle label="Live gallery wall" checked={settings.gallery_enabled} onChange={(v) => set("gallery_enabled", v)} />
         <button className="btn-primary" disabled={busy} onClick={() => void save()}>

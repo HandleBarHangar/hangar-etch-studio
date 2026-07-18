@@ -335,7 +335,12 @@ export default function GuestApp({ params }: { params: UrlParams }) {
         />
       )}
       {step === "upload" && (
-        <Upload error={error} onAccept={acceptUpload} onBack={() => setStep("welcome")} />
+        <Upload
+          error={error}
+          designerUrl={ctx.designer_gpt_url}
+          onAccept={acceptUpload}
+          onBack={() => setStep("welcome")}
+        />
       )}
       {step === "text" && (
         <JustText error={error} onAccept={(t, f) => void acceptText(t, f)} onBack={() => setStep("welcome")} />
