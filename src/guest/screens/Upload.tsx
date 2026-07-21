@@ -8,24 +8,27 @@ interface Props {
   error: string | null;
   designerUrl?: string | null;
   onAccept: (image: HTMLImageElement, threshold: number | null) => void;
+  onRedraw: (file: File) => void;
   onBack: () => void;
 }
 
-export default function Upload({ error, designerUrl, onAccept, onBack }: Props) {
+export default function Upload({ error, designerUrl, onAccept, onRedraw, onBack }: Props) {
   const [image, setImage] = useState<HTMLImageElement | null>(null);
+  const [file, setFile] = useState<File | null>(null);
   const [bwOn, setBwOn] = useState(true);
   const [threshold, setThreshold] = useState(128);
   const [loadError, setLoadError] = useState<string | null>(null);
   const [laserWarnings, setLaserWarnings] = useState<string[]>([]);
   const previewRef = useRef<HTMLDivElement>(null);
 
-  const onFile = async (file: File | undefined) => {
-    if (!file) return;
+  const onFile = async (picked: File | undefined) => {
+    if (!picked) return;
     setLoadError(null);
     try {
-      const url = URL.createObjectURL(file);
+      const url = URL.createObjectURL(picked);
       const img = await loadImage(url);
       setImage(img);
+      setFile(picked);
     } catch {
       setLoadError("Couldn't read that image — try another one.");
     }
@@ -111,6 +114,17 @@ export default function Upload({ error, designerUrl, onAccept, onBack }: Props) 
           <button className="btn-primary" onClick={() => onAccept(image, bwOn ? threshold : null)}>
             Use This Design →
           </button>
+          {file && (
+            <div className="card p-4 text-center flex flex-col gap-2">
+              <p className="text-sm text-muted">
+                Photo of a person, pet, or scene? Photos engrave best redrawn as bold outlines —
+                background removed, subject only.
+              </p>
+              <button className="btn-secondary" onClick={() => onRedraw(file)}>
+                ✨ Redraw for Engraving
+              </button>
+            </div>
+          )}
         </>
       )}
       {!image && designerUrl && (

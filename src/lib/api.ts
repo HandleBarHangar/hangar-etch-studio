@@ -58,12 +58,14 @@ export function generateCaricature(args: {
   deviceToken: string;
   uploadPath: string;
   eventSlug: string | null;
+  style?: "caricature" | "lineart";
 }): Promise<GenerateResult> {
   return invoke<GenerateResult>("etch-caricature", {
     session_id: args.sessionId,
     device_token: args.deviceToken,
     upload_path: args.uploadPath,
     event_slug: args.eventSlug,
+    style: args.style ?? "caricature",
   });
 }
 

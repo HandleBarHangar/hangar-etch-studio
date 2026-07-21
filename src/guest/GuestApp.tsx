@@ -208,18 +208,19 @@ export default function GuestApp({ params }: { params: UrlParams }) {
     }
   };
 
-  const runCaricature = async (file: File) => {
-    setBusy("Scanning the crew…");
+  const runCaricature = async (file: File, style: "caricature" | "lineart" = "caricature") => {
+    setBusy(style === "lineart" ? "Redrawing for the laser…" : "Scanning the crew…");
     setError(null);
     try {
       const path = `crew/${sessionId}/${crypto.randomUUID()}.${file.name.split(".").pop()?.toLowerCase() || "jpg"}`;
       await uploadToBucket(path, file);
-      setBusy("Drawing your caricatures…");
+      if (style === "caricature") setBusy("Drawing your caricatures…");
       const res = await generateCaricature({
         sessionId,
         deviceToken,
         uploadPath: path,
         eventSlug: params.eventSlug,
+        style,
       });
       if (!res.ok || !res.design_url) {
         setError(friendlyError(res.error));
@@ -356,6 +357,7 @@ export default function GuestApp({ params }: { params: UrlParams }) {
           error={error}
           designerUrl={ctx.designer_gpt_url}
           onAccept={acceptUpload}
+          onRedraw={(file) => void runCaricature(file, "lineart")}
           onBack={() => setStep("welcome")}
         />
       )}
