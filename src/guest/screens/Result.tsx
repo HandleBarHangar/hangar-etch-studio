@@ -1,8 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
-import { Check, Pencil, RotateCcw } from "lucide-react";
+import { Check, Pencil, RotateCcw, TriangleAlert } from "lucide-react";
 import type { DesignSource } from "../GuestApp";
 import type { EtchItem, InputMode } from "../../lib/types";
-import { renderPreview } from "../../lib/canvas";
+import { loadImage, renderPreview } from "../../lib/canvas";
+import { analyzeLaserability } from "../../lib/laserability";
 import MockupPreview from "../MockupPreview";
 import { ErrorBanner, TwoBeat } from "../components";
 
@@ -35,9 +36,25 @@ export default function Result({
 
   // A displayable URL for both the flat preview and the SVG mockup overlay.
   const [displayUrl, setDisplayUrl] = useState<string | null>(null);
+  const [laserWarnings, setLaserWarnings] = useState<string[]>([]);
   useEffect(() => {
+    setLaserWarnings([]);
     if (design.kind === "remote") {
       setDisplayUrl(design.url);
+      // AI art is already steered toward outline style, but heavy-fill results
+      // still slip through — warn like the upload path does (customer feedback:
+      // solid shading collapses on powder-coated tumblers).
+      let alive = true;
+      loadImage(design.url)
+        .then((img) => {
+          if (!alive) return;
+          const report = analyzeLaserability(renderPreview(img, 200, 640));
+          setLaserWarnings(report.warnings);
+        })
+        .catch(() => undefined);
+      return () => {
+        alive = false;
+      };
     } else if (design.kind === "canvas") {
       setDisplayUrl(design.canvas.toDataURL("image/png"));
     } else {
@@ -70,6 +87,20 @@ export default function Result({
         <button className="chip mx-auto" onClick={() => setShowMockup((s) => !s)}>
           {showMockup ? "See the flat art" : `See it on your ${item.label.replace(/^Custom\s+/i, "")}`}
         </button>
+      )}
+
+      {laserWarnings.length > 0 && (
+        <div className="rounded-xl border border-gold/40 bg-gold/10 px-4 py-3 text-sm text-gold-soft flex gap-2">
+          <TriangleAlert className="h-5 w-5 shrink-0 mt-0.5" />
+          <div>
+            {laserWarnings.map((w) => (
+              <p key={w}>{w}</p>
+            ))}
+            {mode === "describe" && revisionsLeft > 0 && (
+              <p className="text-muted mt-1">Try a tweak like "outline style, less shading".</p>
+            )}
+          </div>
+        </div>
       )}
 
       {aiMode && (
