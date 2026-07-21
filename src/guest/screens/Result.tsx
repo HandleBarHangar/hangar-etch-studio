@@ -48,14 +48,14 @@ export default function Result({
       loadImage(design.url)
         .then((img) => {
           if (!alive) return;
-          // Tumbler-specific thresholds (tighter than the upload analyzer): the
-          // style directive targets <20% black coverage, so warn well before
-          // the upload path's 55% heavy-fill line, and skip upload-only advice.
+          // Engraving-specific thresholds (tighter than the upload analyzer):
+          // the style directive targets <20% black coverage — solid fills wash
+          // out on every product we laser, worst on powder-coated drinkware.
           const { blackRatio, detailScore } = analyzeLaserability(renderPreview(img, 200, 640));
           const warnings: string[] = [];
           if (blackRatio > 0.28) {
             warnings.push(
-              "Quite a lot of solid black — heavy shading turns into one flat patch when engraved on a tumbler.",
+              "Quite a lot of solid black — heavy shading washes out when engraved. Bold outlines come out best.",
             );
           }
           if (detailScore > 0.09) {
